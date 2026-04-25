@@ -57,7 +57,7 @@ export default function ScrollBlackHole() {
         );
 
       gsap.to('.orbit-particle', {
-        rotate: 360,
+        '--spin': '360deg',
         duration: 18,
         repeat: -1,
         ease: 'none',

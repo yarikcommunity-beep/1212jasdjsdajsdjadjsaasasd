@@ -215,6 +215,7 @@ a {
 
 .exploded-view {
   --explode: 0;
+  --spin: 0deg;
 }
 
 .black-hole-core {
@@ -265,7 +266,7 @@ a {
   background: rgba(255,255,255,.88);
   box-shadow: 0 0 12px rgba(255,255,255,.65);
   transform:
-    rotate(var(--angle))
+    rotate(calc(var(--angle) + var(--spin)))
     translateX(calc(var(--radius) + (var(--explode) * var(--drift))))
     scale(calc(.7 + (var(--explode) * 1.15)));
   opacity: calc(.24 + (var(--explode) * .74));
