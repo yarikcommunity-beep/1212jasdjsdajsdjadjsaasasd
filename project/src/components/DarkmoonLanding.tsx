@@ -38,6 +38,7 @@ const featureCards = [
 ];
 
 export default function DarkmoonLanding() {
+  const pageRef = useRef<HTMLElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll();
   const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
@@ -81,13 +82,13 @@ export default function DarkmoonLanding() {
           },
         );
       });
-    }, sectionRef);
+    }, pageRef);
 
     return () => context.revert();
   }, []);
 
   return (
-    <main className="darkmoon-page">
+    <main ref={pageRef} className="darkmoon-page">
       <ScrollBlackHole />
 
       <motion.div className="deep-space-grid" style={{ y: backgroundY }} />
