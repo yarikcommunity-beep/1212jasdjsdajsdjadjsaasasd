@@ -12,42 +12,79 @@ import {
   TorusGeometry,
 } from 'three';
 
+const seededNoise = (index: number) => {
+  const value = Math.sin(index * 127.1) * 43758.5453123;
+  return value - Math.floor(value);
+};
+
 function AccretionDisk() {
   const diskRef = useRef<Group>(null);
   const innerDiskRef = useRef<Group>(null);
+  const diskGeometry = useMemo(() => {
+    const positions: number[] = [];
+
+    for (let index = 0; index < 2200; index += 1) {
+      const angle = seededNoise(index) * Math.PI * 2;
+      const radius = 1.08 + seededNoise(index + 19) * 2.05;
+      const turbulence = Math.sin(angle * 4 + radius * 2.8) * 0.08;
+      const thickness = (seededNoise(index + 43) - 0.5) * 0.075;
+
+      positions.push(
+        Math.cos(angle) * (radius + turbulence),
+        thickness,
+        Math.sin(angle) * (radius * 0.34 + turbulence),
+      );
+    }
+
+    const bufferGeometry = new BufferGeometry();
+    bufferGeometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+
+    return bufferGeometry;
+  }, []);
 
   useFrame(({ clock }) => {
     const elapsed = clock.getElapsedTime();
 
     if (diskRef.current) {
-      diskRef.current.rotation.z = elapsed * 0.42;
-      diskRef.current.rotation.x = 1.13 + Math.sin(elapsed * 0.35) * 0.03;
+      diskRef.current.rotation.z = elapsed * 0.24;
+      diskRef.current.rotation.x = 1.08 + Math.sin(elapsed * 0.32) * 0.035;
     }
 
     if (innerDiskRef.current) {
-      innerDiskRef.current.rotation.z = -elapsed * 0.68;
+      innerDiskRef.current.rotation.z = -elapsed * 0.62;
     }
   });
 
   return (
     <group ref={diskRef}>
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.8, 0.055, 16, 220]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.88} blending={AdditiveBlending} />
+      <points geometry={diskGeometry}>
+        <pointsMaterial
+          color="#ffffff"
+          size={0.016}
+          sizeAttenuation
+          transparent
+          opacity={0.72}
+          blending={AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+      <mesh>
+        <torusGeometry args={[1.48, 0.018, 12, 260]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.38} blending={AdditiveBlending} depthWrite={false} />
       </mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.52, 0.035, 12, 220]} />
-        <meshBasicMaterial color="#cfcfcf" transparent opacity={0.44} blending={AdditiveBlending} />
+      <mesh>
+        <torusGeometry args={[1.86, 0.012, 10, 260]} />
+        <meshBasicMaterial color="#f5f5f5" transparent opacity={0.22} blending={AdditiveBlending} depthWrite={false} />
       </mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[2.1, 0.026, 12, 220]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.3} blending={AdditiveBlending} />
+      <mesh>
+        <torusGeometry args={[2.42, 0.008, 8, 260]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.12} blending={AdditiveBlending} depthWrite={false} />
       </mesh>
 
       <group ref={innerDiskRef}>
-        <mesh rotation={[Math.PI / 2, 0, Math.PI / 9]}>
-          <torusGeometry args={[1.22, 0.018, 10, 160]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.5} blending={AdditiveBlending} />
+        <mesh rotation={[0, 0, Math.PI / 8]}>
+          <torusGeometry args={[1.18, 0.01, 8, 180]} />
+          <meshBasicMaterial color="#ffffff" transparent opacity={0.5} blending={AdditiveBlending} depthWrite={false} />
         </mesh>
       </group>
     </group>
@@ -73,12 +110,19 @@ function PhotonShell() {
         <meshBasicMaterial color="#000000" />
       </mesh>
       <mesh>
-        <sphereGeometry args={[1.09, 96, 96]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.08} side={DoubleSide} blending={AdditiveBlending} />
+        <sphereGeometry args={[1.13, 96, 96]} />
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.055}
+          side={DoubleSide}
+          blending={AdditiveBlending}
+          depthWrite={false}
+        />
       </mesh>
       <mesh>
-        <sphereGeometry args={[1.26, 96, 96]} />
-        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.045} blending={AdditiveBlending} />
+        <sphereGeometry args={[1.38, 96, 96]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.035} blending={AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -89,10 +133,10 @@ function ParticleHalo() {
   const geometry = useMemo(() => {
     const positions: number[] = [];
 
-    for (let index = 0; index < 1300; index += 1) {
-      const angle = Math.random() * Math.PI * 2;
-      const radius = 1.42 + Math.random() * 1.55;
-      const height = (Math.random() - 0.5) * 0.24;
+    for (let index = 0; index < 1700; index += 1) {
+      const angle = seededNoise(index + 83) * Math.PI * 2;
+      const radius = 1.36 + seededNoise(index + 127) * 1.75;
+      const height = (seededNoise(index + 211) - 0.5) * 0.22;
       const swirl = Math.sin(angle * 3) * 0.18;
 
       positions.push(
@@ -124,34 +168,39 @@ function ParticleHalo() {
         size={0.018}
         sizeAttenuation
         transparent
-        opacity={0.72}
+        opacity={0.58}
         blending={AdditiveBlending}
+        depthWrite={false}
       />
     </points>
   );
 }
 
 function GravitationalLens() {
-  const ringGeometry = useMemo(() => new TorusGeometry(1.34, 0.009, 8, 180), []);
+  const ringGeometry = useMemo(() => new TorusGeometry(1.34, 0.006, 8, 240), []);
   const lensRef = useRef<Group>(null);
 
   useFrame(({ clock }) => {
     const elapsed = clock.getElapsedTime();
 
     if (lensRef.current) {
-      lensRef.current.rotation.z = elapsed * -0.22;
-      lensRef.current.scale.setScalar(1 + Math.sin(elapsed * 1.4) * 0.015);
+      lensRef.current.rotation.z = elapsed * -0.08;
+      lensRef.current.scale.setScalar(1 + Math.sin(elapsed * 1.1) * 0.012);
     }
   });
 
   return (
     <group ref={lensRef}>
-      <mesh geometry={ringGeometry} rotation={[Math.PI / 2, 0, 0]}>
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6} blending={AdditiveBlending} />
+      <mesh geometry={ringGeometry}>
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.18} blending={AdditiveBlending} depthWrite={false} />
       </mesh>
-      <mesh rotation={[Math.PI / 2.75, 0, Math.PI / 7]}>
-        <torusGeometry args={[1.68, 0.011, 8, 190]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.32} blending={AdditiveBlending} />
+      <mesh rotation={[0.12, 0.03, Math.PI / 9]}>
+        <torusGeometry args={[1.72, 0.006, 8, 240]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.12} blending={AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh rotation={[-0.16, 0.02, -Math.PI / 11]}>
+        <torusGeometry args={[2.12, 0.004, 8, 240]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.075} blending={AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -184,7 +233,7 @@ function BlackHoleScene() {
 
 export default function BlackHoleModel() {
   return (
-    <Canvas camera={{ position: [0, 0, 5.2], fov: 36 }} dpr={[1, 2]} gl={{ alpha: true, antialias: true }}>
+    <Canvas camera={{ position: [0, 0, 5.2], fov: 34 }} dpr={[1, 2]} gl={{ alpha: true, antialias: true }}>
       <BlackHoleScene />
     </Canvas>
   );

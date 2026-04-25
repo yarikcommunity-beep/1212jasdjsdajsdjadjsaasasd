@@ -148,6 +148,20 @@ a {
   transition: transform .35s ease, border-color .35s ease, background .35s ease;
 }
 
+.primary-link::before,
+.secondary-link::before {
+  content: '';
+  position: absolute;
+  top: -120%;
+  left: -40%;
+  width: 34%;
+  height: 340%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  opacity: .42;
+  transform: rotate(24deg);
+  animation: linkGlint 4.8s ease-in-out infinite;
+}
+
 .primary-link {
   background: #fff;
   color: #000;
@@ -158,6 +172,7 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.24);
   color: #fff;
   background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 28px rgba(255,255,255,.04);
 }
 
 .primary-link:hover,
@@ -198,12 +213,12 @@ a {
 .scroll-black-hole {
   --size: clamp(330px, 46vw, 680px);
   position: fixed;
-  top: 12vh;
-  right: 4vw;
+  top: 9vh;
+  right: 1vw;
   width: var(--size);
   height: var(--size);
   transform-origin: center;
-  filter: contrast(1.2);
+  filter: contrast(1.14) saturate(.92);
   will-change: transform, filter;
 }
 
@@ -222,8 +237,9 @@ a {
   z-index: 2;
   overflow: visible;
   filter:
-    drop-shadow(0 0 22px rgba(255, 255, 255, .35))
-    drop-shadow(0 0 72px rgba(255, 255, 255, .2));
+    drop-shadow(0 0 18px rgba(255, 255, 255, .16))
+    drop-shadow(0 0 78px rgba(255, 255, 255, .14));
+  will-change: filter, transform;
 }
 
 .black-hole-core canvas {
@@ -244,16 +260,23 @@ a {
 }
 
 .black-hole-core::before {
-  background: radial-gradient(circle, transparent 44%, rgba(255,255,255,.16) 54%, transparent 66%);
-  filter: blur(8px);
+  inset: 11%;
+  background:
+    radial-gradient(ellipse at 50% 51%, transparent 37%, rgba(255,255,255,.13) 46%, rgba(255,255,255,.035) 56%, transparent 68%);
+  filter: blur(18px);
+  opacity: .82;
+  transform: rotate(-8deg) scaleX(1.16);
 }
 
 .black-hole-core::after {
-  inset: 31%;
-  background: radial-gradient(circle, #000 48%, rgba(0,0,0,.92) 62%, rgba(255,255,255,.1) 72%, transparent 83%);
+  inset: 28%;
+  background:
+    radial-gradient(circle at 48% 50%, #000 0 45%, rgba(0,0,0,.96) 58%, rgba(255,255,255,.055) 69%, transparent 82%);
   box-shadow:
-    inset -24px 18px 42px rgba(255,255,255,.035),
-    0 0 58px rgba(255,255,255,.22);
+    inset -30px 20px 58px rgba(255,255,255,.025),
+    0 0 42px rgba(255,255,255,.1),
+    0 0 140px rgba(255,255,255,.08);
+  filter: blur(.2px);
 }
 
 .orbit-particle {
@@ -263,13 +286,13 @@ a {
   width: var(--size);
   height: var(--size);
   border-radius: 999px;
-  background: rgba(255,255,255,.88);
-  box-shadow: 0 0 12px rgba(255,255,255,.65);
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 0 16px rgba(255,255,255,.55);
   transform:
     rotate(calc(var(--angle) + var(--spin)))
     translateX(calc(var(--radius) + (var(--explode) * var(--drift))))
     scale(calc(.7 + (var(--explode) * 1.15)));
-  opacity: calc(.24 + (var(--explode) * .74));
+  opacity: calc(.18 + (var(--explode) * .78));
   animation-delay: var(--delay);
 }
 
@@ -382,6 +405,7 @@ a {
   color: transparent;
   -webkit-text-stroke: 1px rgba(255,255,255,.82);
   text-shadow: 0 0 42px rgba(255,255,255,.18);
+  filter: drop-shadow(0 0 32px rgba(255,255,255,.07));
 }
 
 .feature-section {
@@ -399,6 +423,13 @@ a {
   background: linear-gradient(160deg, rgba(255,255,255,.11), rgba(255,255,255,.025));
   box-shadow: inset 0 1px 0 rgba(255,255,255,.16);
   backdrop-filter: blur(24px);
+  transition: transform .55s ease, border-color .55s ease, background .55s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(255,255,255,.32);
+  background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.035));
 }
 
 .feature-card span {
@@ -450,6 +481,15 @@ a {
   50% {
     transform: scaleY(1);
     opacity: 1;
+  }
+}
+
+@keyframes linkGlint {
+  0%, 32% {
+    transform: translateX(-180%) rotate(24deg);
+  }
+  58%, 100% {
+    transform: translateX(520%) rotate(24deg);
   }
 }
 

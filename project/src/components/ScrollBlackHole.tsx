@@ -29,18 +29,18 @@ export default function ScrollBlackHole() {
 
       timeline
         .to(vortexRef.current, {
-          scale: 2.65,
-          rotate: 180,
-          xPercent: -16,
-          yPercent: 13,
-          filter: 'blur(0px) contrast(1.25)',
+          scale: 2.82,
+          rotate: 142,
+          xPercent: -19,
+          yPercent: 16,
+          filter: 'blur(0px) contrast(1.32) brightness(1.08)',
           ease: 'none',
         })
         .to(
           coreRef.current,
           {
-            scale: 1.95,
-            boxShadow: '0 0 90px rgba(255,255,255,.72), inset 0 0 70px rgba(0,0,0,1)',
+            scale: 2.04,
+            filter: 'drop-shadow(0 0 34px rgba(255,255,255,.26)) drop-shadow(0 0 120px rgba(255,255,255,.18))',
             ease: 'none',
           },
           0,
@@ -49,8 +49,8 @@ export default function ScrollBlackHole() {
           debrisRef.current,
           {
             '--explode': 1,
-            rotate: -95,
-            scale: 1.45,
+            rotate: -122,
+            scale: 1.72,
             ease: 'none',
           },
           0.15,
