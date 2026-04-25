@@ -22,7 +22,19 @@ const seedUsers: SocialUser[] = [
 
 const normalizeUsername = (value: string) => value.trim().toUpperCase();
 
-const isValidUsername = (value: string) => /^[A-Za-z]{4,}$/.test(value);
+const sanitizeUsername = (value: string) => value.replace(/[^A-Za-z]/g, '').slice(0, 18).toUpperCase();
+
+const isValidUsername = (value: string) => /^[A-Z]{4,}$/.test(value);
+
+const mergeSeedUsers = (users: SocialUser[]) => {
+  const mergedUsers = [...users];
+  seedUsers.forEach((seedUser) => {
+    if (!mergedUsers.some((user) => user.username === seedUser.username)) {
+      mergedUsers.push(seedUser);
+    }
+  });
+  return mergedUsers;
+};
 
 const readUsers = () => {
   if (typeof window === 'undefined') {
@@ -37,7 +49,9 @@ const readUsers = () => {
 
   try {
     const parsedUsers = JSON.parse(rawUsers) as SocialUser[];
-    return parsedUsers.length > 0 ? parsedUsers : seedUsers;
+    const nextUsers = mergeSeedUsers(parsedUsers);
+    window.localStorage.setItem(directoryStorageKey, JSON.stringify(nextUsers));
+    return nextUsers;
   } catch {
     window.localStorage.setItem(directoryStorageKey, JSON.stringify(seedUsers));
     return seedUsers;
@@ -49,8 +63,9 @@ export default function DarkmoonSocialHub() {
   const [users, setUsers] = useState<SocialUser[]>(seedUsers);
   const [currentUser, setCurrentUser] = useState<SocialUser | null>(null);
   const [username, setUsername] = useState('');
-  const [profileMessage, setProfileMessage] = useState('Username: минимум 4 английские буквы.');
+  const [profileMessage, setProfileMessage] = useState('Выбери свободный username.');
   const [query, setQuery] = useState('');
+  const [selectedUser, setSelectedUser] = useState<SocialUser | null>(null);
 
   useEffect(() => {
     const storedUsers = readUsers();
@@ -62,50 +77,88 @@ export default function DarkmoonSocialHub() {
     }
 
     try {
-      setCurrentUser(JSON.parse(rawProfile) as SocialUser);
+      const storedProfile = JSON.parse(rawProfile) as SocialUser;
+      setCurrentUser(storedProfile);
+      setUsername(storedProfile.username);
     } catch {
       window.localStorage.removeItem(profileStorageKey);
     }
   }, []);
 
+  const normalizedQuery = normalizeUsername(query);
+  const normalizedUsername = normalizeUsername(username);
+
+  const isDuplicateUsername = users.some(
+    (user) => user.username === normalizedUsername && user.username !== currentUser?.username,
+  );
+
+  const usernameFeedback = useMemo(() => {
+    if (!normalizedUsername) {
+      return 'Введи username: минимум 4 английские буквы.';
+    }
+
+    if (normalizedUsername.length < 4) {
+      return 'Минимум 4 английские буквы.';
+    }
+
+    if (!isValidUsername(normalizedUsername)) {
+      return 'Только латинские буквы A-Z.';
+    }
+
+    if (isDuplicateUsername) {
+      return `Username ${normalizedUsername} уже занят.`;
+    }
+
+    if (currentUser?.username === normalizedUsername) {
+      return `@${normalizedUsername} уже закреплен за тобой.`;
+    }
+
+    return `@${normalizedUsername} свободен.`;
+  }, [currentUser?.username, isDuplicateUsername, normalizedUsername]);
+
   const filteredUsers = useMemo(() => {
-    const normalizedQuery = normalizeUsername(query);
     if (!normalizedQuery) {
       return users;
     }
 
     return users.filter((user) => user.username.includes(normalizedQuery));
-  }, [query, users]);
+  }, [normalizedQuery, users]);
+
+  const canSaveUsername =
+    isValidUsername(normalizedUsername) &&
+    !isDuplicateUsername &&
+    currentUser?.username !== normalizedUsername;
 
   const saveDirectory = (nextUsers: SocialUser[]) => {
     setUsers(nextUsers);
     window.localStorage.setItem(directoryStorageKey, JSON.stringify(nextUsers));
   };
 
+  const handleUsernameChange = (value: string) => {
+    setUsername(sanitizeUsername(value));
+    setProfileMessage('Выбери свободный username.');
+  };
+
   const handleCreateProfile = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const nextUsername = normalizeUsername(username);
-    if (!isValidUsername(username.trim())) {
-      setProfileMessage('Ошибка: только английские буквы, минимум 4 символа.');
-      return;
-    }
-
-    const alreadyExists = users.some((user) => user.username === nextUsername);
-    if (alreadyExists) {
-      setProfileMessage(`Username ${nextUsername} уже занят.`);
+    if (!canSaveUsername) {
+      setProfileMessage(usernameFeedback);
       return;
     }
 
     const nextUser = {
-      username: nextUsername,
-      signal: 'new darkmoon profile',
+      username: normalizedUsername,
+      signal: currentUser ? 'darkmoon profile updated' : 'new darkmoon profile',
     };
-    const nextUsers = [nextUser, ...users];
+    const withoutPreviousProfile = currentUser
+      ? users.filter((user) => user.username !== currentUser.username)
+      : users;
+    const nextUsers = [nextUser, ...withoutPreviousProfile];
     saveDirectory(nextUsers);
     setCurrentUser(nextUser);
-    setUsername('');
-    setProfileMessage(`Профиль @${nextUsername} создан.`);
+    setSelectedUser(nextUser);
+    setProfileMessage(`Профиль @${normalizedUsername} сохранен.`);
     window.localStorage.setItem(profileStorageKey, JSON.stringify(nextUser));
   };
 
@@ -117,65 +170,106 @@ export default function DarkmoonSocialHub() {
     }
   };
 
+  const handleSearchChange = (value: string) => {
+    setQuery(sanitizeUsername(value));
+    setSelectedUser(null);
+  };
+
   return (
     <>
       <div className={`social-glass-panel ${activePanel === 'home' ? '' : 'is-open'}`}>
         {activePanel === 'profile' && (
           <section aria-label="Create profile">
             <div className="panel-kicker">profile signal</div>
-            <h2>Создай свой профиль</h2>
+            <div className="panel-heading">
+              <h2>Создай профиль</h2>
+              <span>{users.length.toString().padStart(2, '0')} signals</span>
+            </div>
             <p>
-              Username уникальный: нельзя повторять, минимум 4 буквы, только латиница.
+              Username должен быть уникальным: минимум 4 символа, только английские буквы.
             </p>
 
-            {currentUser && (
+            {currentUser ? (
               <div className="current-profile-card">
                 <span>Твой профиль</span>
                 <strong>@{currentUser.username}</strong>
                 <small>{currentUser.signal}</small>
               </div>
+            ) : (
+              <div className="profile-empty-card">
+                <span>Профиль еще не создан</span>
+                <small>Займи свободный username и появись в поиске.</small>
+              </div>
             )}
 
             <form className="profile-form" onSubmit={handleCreateProfile}>
               <label htmlFor="username">username</label>
-              <input
-                id="username"
-                maxLength={18}
-                onChange={(event) => setUsername(event.target.value)}
-                pattern="[A-Za-z]{4,}"
-                placeholder="DARKMOON"
-                type="text"
-                value={username}
-              />
-              <button type="submit">create profile</button>
+              <div className="username-input-shell">
+                <span>@</span>
+                <input
+                  autoComplete="off"
+                  id="username"
+                  maxLength={18}
+                  onChange={(event) => handleUsernameChange(event.target.value)}
+                  placeholder="DARKMOON"
+                  spellCheck={false}
+                  type="text"
+                  value={username}
+                />
+              </div>
+              <button disabled={!canSaveUsername} type="submit">
+                {currentUser ? 'save username' : 'create profile'}
+              </button>
             </form>
-            <p className="profile-message">{profileMessage}</p>
+            <p
+              className={`profile-message ${
+                canSaveUsername ? 'is-success' : isDuplicateUsername ? 'is-error' : ''
+              }`}
+              aria-live="polite"
+            >
+              {profileMessage === 'Выбери свободный username.' ? usernameFeedback : profileMessage}
+            </p>
           </section>
         )}
 
         {activePanel === 'search' && (
           <section aria-label="Search users">
             <div className="panel-kicker">user search</div>
-            <h2>Найти людей</h2>
-            <p>Поиск работает по username в локальной darkmoon-директории.</p>
+            <div className="panel-heading">
+              <h2>Найти людей</h2>
+              <span>{filteredUsers.length.toString().padStart(2, '0')} found</span>
+            </div>
+            <p>Ищи пользователей по username в локальной darkmoon-директории.</p>
             <label className="search-field" htmlFor="search-users">
               <Search size={18} />
               <input
+                autoComplete="off"
                 id="search-users"
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => handleSearchChange(event.target.value)}
                 placeholder="Введите username"
+                spellCheck={false}
                 type="search"
                 value={query}
               />
             </label>
             <div className="user-results">
+              {selectedUser && (
+                <div className="selected-user-card">
+                  <span>Открытый профиль</span>
+                  <strong>@{selectedUser.username}</strong>
+                  <small>{selectedUser.signal}</small>
+                </div>
+              )}
+
               {filteredUsers.map((user) => (
                 <article className="user-result-card" key={user.username}>
                   <div>
                     <strong>@{user.username}</strong>
                     <span>{user.signal}</span>
                   </div>
-                  <button type="button">open</button>
+                  <button onClick={() => setSelectedUser(user)} type="button">
+                    open
+                  </button>
                 </article>
               ))}
               {filteredUsers.length === 0 && (
