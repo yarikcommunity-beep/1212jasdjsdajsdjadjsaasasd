@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import DarkmoonSocialHub from './DarkmoonSocialHub';
 import ScrollBlackHole from './ScrollBlackHole';
 
 const RiftGlassCube = dynamic(() => import('./RiftGlassCube'), {
@@ -93,6 +94,7 @@ export default function DarkmoonLanding() {
 
       <motion.div className="deep-space-grid" style={{ y: backgroundY }} />
       <div className="noise-layer" />
+      <DarkmoonSocialHub />
 
       <section className="hero-section">
         <motion.div

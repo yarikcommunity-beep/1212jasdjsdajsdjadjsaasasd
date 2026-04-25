@@ -202,6 +202,253 @@ a {
   animation: scrollPulse 1.5s ease-in-out infinite;
 }
 
+.iphone-glass-nav {
+  position: fixed;
+  right: 50%;
+  bottom: 1.2rem;
+  z-index: 20;
+  display: grid;
+  width: min(420px, calc(100vw - 2rem));
+  grid-template-columns: repeat(3, 1fr);
+  gap: .45rem;
+  padding: .55rem;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.045)),
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.28), transparent 70%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.28),
+    inset 0 -24px 48px rgba(0,0,0,.42),
+    0 22px 80px rgba(0,0,0,.78);
+  transform: translateX(50%);
+  backdrop-filter: blur(28px) saturate(145%);
+}
+
+.iphone-glass-nav::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent),
+    repeating-linear-gradient(115deg, rgba(255,255,255,.05) 0 1px, transparent 1px 7px);
+  opacity: .72;
+  mix-blend-mode: screen;
+}
+
+.iphone-glass-nav button {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 58px;
+  place-items: center;
+  gap: .1rem;
+  border: 0;
+  border-radius: 999px;
+  color: rgba(255,255,255,.62);
+  background: transparent;
+  font: inherit;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  transition: transform .35s ease, color .35s ease, background .35s ease, box-shadow .35s ease;
+  cursor: pointer;
+}
+
+.iphone-glass-nav button:hover,
+.iphone-glass-nav button.is-active {
+  color: #000;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 0 32px rgba(255,255,255,.3);
+  transform: translateY(-2px);
+}
+
+.social-glass-panel {
+  position: fixed;
+  right: 50%;
+  bottom: 6.5rem;
+  z-index: 19;
+  width: min(520px, calc(100vw - 2rem));
+  max-height: min(620px, calc(100vh - 8rem));
+  overflow: auto;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 34px;
+  padding: 1.4rem;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.035)),
+    radial-gradient(circle at 10% 0%, rgba(255,255,255,.24), transparent 42%),
+    rgba(8,8,8,.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.24),
+    inset 0 -30px 70px rgba(0,0,0,.4),
+    0 34px 120px rgba(0,0,0,.82);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(50%, 20px) scale(.96);
+  transition: opacity .36s ease, transform .36s ease;
+  backdrop-filter: blur(34px) saturate(150%);
+}
+
+.social-glass-panel.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(50%, 0) scale(1);
+}
+
+.social-glass-panel h2 {
+  margin: .65rem 0 .75rem;
+  font-size: clamp(2rem, 7vw, 4.6rem);
+  letter-spacing: -.08em;
+  line-height: .9;
+  text-transform: uppercase;
+}
+
+.social-glass-panel p {
+  margin: 0;
+  color: rgba(255,255,255,.64);
+  line-height: 1.6;
+}
+
+.panel-kicker,
+.profile-form label {
+  color: rgba(255,255,255,.46);
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+}
+
+.current-profile-card,
+.user-result-card,
+.empty-results {
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.035));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+.current-profile-card {
+  display: grid;
+  gap: .25rem;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.current-profile-card span,
+.current-profile-card small,
+.user-result-card span {
+  color: rgba(255,255,255,.5);
+  font-size: .82rem;
+}
+
+.current-profile-card strong,
+.user-result-card strong {
+  font-size: 1.35rem;
+  letter-spacing: -.04em;
+}
+
+.profile-form {
+  display: grid;
+  gap: .7rem;
+  margin-top: 1.2rem;
+}
+
+.profile-form input,
+.search-field input {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  outline: 0;
+  color: #fff;
+  background: rgba(0,0,0,.42);
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.profile-form input {
+  padding: 1rem 1.1rem;
+}
+
+.profile-form input:focus,
+.search-field:focus-within {
+  border-color: rgba(255,255,255,.55);
+  box-shadow: 0 0 34px rgba(255,255,255,.16);
+}
+
+.profile-form button,
+.user-result-card button {
+  border: 0;
+  border-radius: 999px;
+  color: #000;
+  background: #fff;
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.profile-form button {
+  padding: 1rem 1.2rem;
+}
+
+.profile-message {
+  margin-top: .9rem !important;
+  font-size: .92rem;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  margin-top: 1.1rem;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  padding: .2rem .95rem;
+  background: rgba(0,0,0,.42);
+  transition: border-color .35s ease, box-shadow .35s ease;
+}
+
+.search-field input {
+  border: 0;
+  padding: .88rem 0;
+  background: transparent;
+}
+
+.user-results {
+  display: grid;
+  gap: .7rem;
+  margin-top: 1rem;
+}
+
+.user-result-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .9rem .9rem .9rem 1rem;
+}
+
+.user-result-card div {
+  display: grid;
+  gap: .18rem;
+}
+
+.user-result-card button {
+  padding: .78rem 1rem;
+}
+
+.empty-results {
+  padding: 1rem;
+  color: rgba(255,255,255,.55);
+}
+
 .black-hole-scroll-field {
   pointer-events: none;
   position: absolute;
@@ -525,6 +772,27 @@ a {
 
   .hero-orbit-note {
     display: none;
+  }
+
+  .iphone-glass-nav {
+    bottom: .75rem;
+    padding: .42rem;
+  }
+
+  .iphone-glass-nav button {
+    min-height: 54px;
+    font-size: .62rem;
+  }
+
+  .social-glass-panel {
+    bottom: 5.8rem;
+    border-radius: 28px;
+    padding: 1.1rem;
+  }
+
+  .user-result-card {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .cube-stage {
