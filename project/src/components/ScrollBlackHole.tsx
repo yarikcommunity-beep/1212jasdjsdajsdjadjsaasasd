@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const particleCount = 80;
+const BlackHoleModel = dynamic(() => import('./BlackHoleModel'), { ssr: false });
 
 export default function ScrollBlackHole() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -85,12 +87,9 @@ export default function ScrollBlackHole() {
       <div className="cosmic-dust cosmic-dust-one" />
       <div className="cosmic-dust cosmic-dust-two" />
       <div ref={vortexRef} className="scroll-black-hole">
-        <div className="photon-ring photon-ring-a" />
-        <div className="photon-ring photon-ring-b" />
-        <div className="photon-ring photon-ring-c" />
-        <div className="accretion-plane accretion-plane-a" />
-        <div className="accretion-plane accretion-plane-b" />
-        <div ref={coreRef} className="black-hole-core" />
+        <div ref={coreRef} className="black-hole-core">
+          <BlackHoleModel />
+        </div>
         <div ref={debrisRef} className="exploded-view">
           {Array.from({ length: particleCount }).map((_, index) => {
             const angle = (360 / particleCount) * index;

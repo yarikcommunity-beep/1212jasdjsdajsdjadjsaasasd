@@ -207,82 +207,48 @@ a {
   will-change: transform, filter;
 }
 
-.scroll-black-hole::before,
-.scroll-black-hole::after {
-  content: '';
-  position: absolute;
-  inset: 2%;
-  border-radius: 50%;
-  background:
-    conic-gradient(from 110deg, transparent, rgba(255,255,255,.12), transparent, rgba(255,255,255,.85), transparent 63%),
-    radial-gradient(ellipse at center, transparent 35%, rgba(255,255,255,.18) 47%, transparent 67%);
-  filter: blur(4px);
-  animation: vortexSpin 22s linear infinite;
-}
-
-.scroll-black-hole::after {
-  inset: 14%;
-  opacity: .66;
-  transform: rotateX(70deg) rotateZ(18deg);
-  animation-duration: 13s;
-  animation-direction: reverse;
-}
-
-.photon-ring,
-.accretion-plane,
 .black-hole-core,
 .exploded-view {
   position: absolute;
   inset: 0;
 }
 
-.photon-ring {
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, .2);
-  box-shadow: inset 0 0 44px rgba(255, 255, 255, .09), 0 0 42px rgba(255,255,255,.12);
-}
-
-.photon-ring-a {
-  inset: 7%;
-  animation: ringWobble 7s ease-in-out infinite;
-}
-
-.photon-ring-b {
-  inset: 18%;
-  opacity: .6;
-  transform: rotateX(74deg) rotateZ(-16deg);
-  animation: ringWobble 9s ease-in-out infinite reverse;
-}
-
-.photon-ring-c {
-  inset: 30%;
-  opacity: .45;
-  transform: rotateY(68deg);
-}
-
-.accretion-plane {
-  top: 45%;
-  left: 4%;
-  right: 4%;
-  height: 10%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.92), transparent);
-  box-shadow: 0 0 46px rgba(255,255,255,.42);
-  transform: rotate(-12deg);
-  filter: blur(1.6px);
-}
-
-.accretion-plane-b {
-  opacity: .45;
-  transform: rotate(14deg) scaleX(.86);
-}
-
 .black-hole-core {
-  inset: 35%;
-  border-radius: 50%;
-  background: radial-gradient(circle, #000 43%, rgba(0,0,0,.98) 60%, rgba(255,255,255,.18) 72%, transparent 82%);
-  box-shadow: 0 0 56px rgba(255,255,255,.38), inset 0 0 70px rgba(0,0,0,1);
   z-index: 2;
+  overflow: visible;
+  filter:
+    drop-shadow(0 0 22px rgba(255, 255, 255, .35))
+    drop-shadow(0 0 72px rgba(255, 255, 255, .2));
+}
+
+.black-hole-core canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.black-hole-core::before,
+.black-hole-core::after {
+  content: '';
+  position: absolute;
+  inset: 18%;
+  z-index: 3;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.black-hole-core::before {
+  background: radial-gradient(circle, transparent 44%, rgba(255,255,255,.16) 54%, transparent 66%);
+  filter: blur(8px);
+}
+
+.black-hole-core::after {
+  inset: 31%;
+  background: radial-gradient(circle, #000 48%, rgba(0,0,0,.92) 62%, rgba(255,255,255,.1) 72%, transparent 83%);
+  box-shadow:
+    inset -24px 18px 42px rgba(255,255,255,.035),
+    0 0 58px rgba(255,255,255,.22);
 }
 
 .orbit-particle {
@@ -470,21 +436,6 @@ a {
   margin-top: -4vw;
   color: rgba(255,255,255,.62);
   font-size: clamp(1rem, 2vw, 1.4rem);
-}
-
-@keyframes vortexSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes ringWobble {
-  0%, 100% {
-    transform: rotateX(65deg) rotateZ(-7deg) scale(1);
-  }
-  50% {
-    transform: rotateX(72deg) rotateZ(9deg) scale(1.08);
-  }
 }
 
 @keyframes scrollPulse {
