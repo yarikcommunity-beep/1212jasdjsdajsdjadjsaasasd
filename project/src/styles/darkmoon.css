@@ -213,6 +213,10 @@ a {
   inset: 0;
 }
 
+.exploded-view {
+  --explode: 0;
+}
+
 .black-hole-core {
   z-index: 2;
   overflow: visible;
@@ -252,7 +256,6 @@ a {
 }
 
 .orbit-particle {
-  --explode: 0;
   position: absolute;
   top: 50%;
   left: 50%;
